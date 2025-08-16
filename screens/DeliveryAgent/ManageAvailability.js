@@ -111,15 +111,31 @@ const ManageAvailability = () => {
   };
 
   const handleSaveToBackend = async () => {
+    const formatTime = (date) => {
+      if (!date) return null;
+      const d = new Date(date);
+      return d.toISOString().substring(11, 19); // HH:mm:ss
+    };
+
     const payload = availabilities.map((entry) => ({
       dayOfWeek: entry.day.toUpperCase(),
-      startTime: entry.startTime ? `${entry.startTime}:00` : null,
-      endTime: entry.endTime ? `${entry.endTime}:00` : null,
+      startTime: entry.isHoliday ? null : formatTime(entry.startTime),
+      endTime: entry.isHoliday ? null : formatTime(entry.endTime),
       holiday: entry.isHoliday,
     }));
 
+    // const payload = availabilities.map((entry) => ({
+    //   dayOfWeek: entry.day.toUpperCase(),
+    //   startTime: entry.startTime ? `${entry.startTime}` : null,
+    //   endTime: entry.endTime ? `${entry.endTime}` : null,
+    //   holiday: entry.isHoliday,
+    // }));
+
     try {
-      await axiosInstance.post('/availability/manage', payload);
+      console.log("Sending availability DTO:", payload);
+      await axiosInstance.post('/availability/manage', payload)
+      .then(res => console.log("Saved:", res))
+      .catch(err => console.error("Error saving availability:", err.response?.data || err.message));
       Alert.alert('Success', 'Availability saved successfully!');
       navigation.goBack();
       handleResetAll();
