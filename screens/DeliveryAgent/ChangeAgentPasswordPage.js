@@ -18,12 +18,14 @@ import { deliveryAgentStyles } from '../../styles/DeliveryAgent/deliveryAgentSty
 import eyeOpen from '../../assets/eye-icon.png';
 import eyeClosed from '../../assets/eye-icon.png'; 
 import { BASE_URL } from '../../config';
+import { LogOut } from 'lucide-react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
 const ChangePasswordScreen = () => {
     const [user, setUser] = useState(null);
     const navigation = useNavigation();
+    const { logout } = useAuth();
     const { token, userId } = useAuth();
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -82,6 +84,11 @@ const ChangePasswordScreen = () => {
             return false;
         }
 
+        if(oldPassword == newPassword) {
+            showToast("New password must be different from old password.", "error");
+            return false;
+        }
+
         if (newPassword !== confirmPassword) {
             showToast("Password and confirm password do not match", "error");
             return false;
@@ -106,7 +113,8 @@ const ChangePasswordScreen = () => {
         );
 
             Alert.alert('Success', res.data);
-            navigation.navigate('ProfileDetail');
+            logout();
+            navigation.navigate('Login'); 
         } catch (err) {
             console.error('Change password error:', err);
             const msg = err.response?.data?.message || 'Failed to change password.';

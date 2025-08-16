@@ -28,11 +28,8 @@ const AvailabilityScreen = () => {
 
                 const [availabilitiesRes] = await Promise.all([
                 
-                    axiosInstance.get('/availability/saved',{
-                         headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                    }).catch(err => {
+                    axiosInstance.get('/availability/saved')
+                    .catch(err => {
                         console.error('Saved availability fetch failed', err);
                         return { data: [] };
                     }),

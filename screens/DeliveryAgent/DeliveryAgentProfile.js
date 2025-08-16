@@ -76,17 +76,12 @@ const DeliveryAgentProfile = () => {
         fetchAllData();
     }, []);
 
-    const handleFileClick = (type) => {
-
-        const userId = data.userId;
-
-        if (type && userId) {
-            const url = `${BASE_URL}/image/agent/${type}/${userId}`;
-            Linking.openURL(url);
+    const handleFileClick = (fileUrl) => {
+        if (fileUrl) {
+            Linking.openURL(fileUrl);
         } else {
-            Alert.alert('Invalid image type or user ID');
-        }
-
+            showToast("Image not available", "error");
+        } 
     };
 
     if (loading) {
@@ -172,7 +167,7 @@ const DeliveryAgentProfile = () => {
                                     <Field
                                         label="PAN Card"
                                         value={data.panCardPhoto ? "Click here..." : "N/A"}
-                                        onPress={() => handleFileClick('pan')}
+                                        onPress={() => handleFileClick(data.panCardPhoto)}
                                     />
 
                                 </View>
@@ -182,12 +177,12 @@ const DeliveryAgentProfile = () => {
                                     <Field
                                         label="Aadhaar Card"
                                         value={data.aadharCardPhoto ? "Click here..." : "N/A"}
-                                        onPress={() => handleFileClick('aadhar')}
+                                        onPress={() => handleFileClick(data.aadharCardPhoto)}
                                     />
                                     <Field
                                         label="Driving License"
                                         value={data.drivingLicensePhoto ? "Click here..." : "N/A"}
-                                        onPress={() => handleFileClick('license')}
+                                        onPress={() => handleFileClick(data.drivingLicensePhoto)}
                                     />
 
                                 </View>
@@ -197,7 +192,7 @@ const DeliveryAgentProfile = () => {
                                     <Field
                                         label="Profile"
                                         value={data.profilePhoto ? "Click here..." : "N/A"}
-                                        onPress={() => handleFileClick('profile')}
+                                        onPress={() => handleFileClick(data.profilePhoto)}
                                     />
 
                                 </View>
