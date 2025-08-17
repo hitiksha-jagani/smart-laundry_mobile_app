@@ -134,40 +134,6 @@ export default function LoginScreen() {
   }
   break;
 
-
-        //   else if (data.role === 'DELIVERY_AGENT') {
-        //   try {
-        //     // 1. Save token and userId in AsyncStorage
-        //     await AsyncStorage.setItem('token', data.jwtToken);
-        //     await AsyncStorage.setItem('role', data.role);
-        //     await AsyncStorage.setItem('userId', userId);
-
-        //     // 2. Check profile existence
-        //     const response = await fetch(http://localhost:8080/profile/exist/${userId});
-
-        //     if (!response.ok) {
-        //       throw new Error('Failed to check agent existence');
-        //     }
-
-        //     const exists = await response.json(); // Boolean
-
-        //     // 3. Navigate based on existence
-        //     if (exists) {
-        //       navigation.navigate('DeliveryAgentRoutes', {
-        //         screen: 'DeliveryPage', 
-        //       });
-        //     } else {
-        //       navigation.navigate('DeliveryAgentRoutes', {
-        //         screen: 'DeliveryPage', 
-        //       });
-        //     }
-
-        //   } catch (err) {
-        //     console.error('Error checking delivery agent existence:', err);
-        //     Alert.alert('Error', 'Unable to verify agent profile. Try again.');
-        //   }
-        // } 
-
         case "DELIVERY_AGENT":
           try {
             const agentRes = await fetch(`${BASE_URL}/profile/exist/${userId}`);
@@ -271,6 +237,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 12,
+    color: "#000",
   },
   passwordContainer: {
     flexDirection: "row",
@@ -286,6 +253,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     paddingRight: 10,
+    color: "#000",
   },
   button: {
     backgroundColor: "#A566FF",

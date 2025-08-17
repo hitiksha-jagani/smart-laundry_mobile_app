@@ -90,26 +90,28 @@ const ActiveOrdersScreen = () => {
     </View>
   );
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate('ProviderDashboard')}>
-        <Text style={styles.backLink}>← Back to Dashboard</Text>
-      </TouchableOpacity>
+ return (
+  <FlatList
+    data={orders}
+    keyExtractor={(item) => item.orderId}
+    renderItem={renderOrderItem}
+    contentContainerStyle={styles.container}
+    ListHeaderComponent={
+      <>
+        <TouchableOpacity onPress={() => navigation.navigate('ProviderDashboard')}>
+          <Text style={styles.backLink}>← Back to Dashboard</Text>
+        </TouchableOpacity>
 
-      <Text style={styles.title}>Active Orders</Text>
+        <Text style={styles.title}>Active Orders</Text>
 
-      {orders.length === 0 ? (
-        <Text style={styles.noOrdersText}>No active orders available.</Text>
-      ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item.orderId}
-          renderItem={renderOrderItem}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      )}
-    </ScrollView>
-  );
+        {orders.length === 0 && (
+          <Text style={styles.noOrdersText}>No active orders available.</Text>
+        )}
+      </>
+    }
+  />
+);
+
 };
 
 const styles = StyleSheet.create({

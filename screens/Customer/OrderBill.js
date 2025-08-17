@@ -13,7 +13,6 @@ import * as Sharing from 'expo-sharing';
 import { useRoute } from '@react-navigation/native';
 import axiosInstance from '../../utils/axiosInstance';
 
-
 export default function OrderBill() {
   const { orderId } = useRoute().params;
   const [summary, setSummary] = useState(null);
@@ -23,7 +22,8 @@ export default function OrderBill() {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const res = await axiosInstance.get(`/bills/${orderId}`);
+        // ✅ Updated API call to match backend
+        const res = await axiosInstance.get(`/orders/${orderId}/bill`);
         setSummary(res.data);
       } catch (error) {
         console.error('Error loading summary:', error);
@@ -131,7 +131,7 @@ export default function OrderBill() {
   );
 }
 
-// HTML generator for PDF
+// ✅ HTML generator for PDF remains unchanged
 const generateHTML = (summary) => {
   const rows = summary.items.map(
     (item) => `

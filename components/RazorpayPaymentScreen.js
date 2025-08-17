@@ -24,7 +24,7 @@ const RazorpayPaymentScreen = () => {
         const res = await axiosInstance.post(`api/payments/create/${invoiceNumber}`);
         const { orderId: razorpayOrderId, amount } = res.data;
 
-        const key = "rzp_test_oBh8qMRL8F61TR"; // Replace with your real Razorpay key
+        const key = "rzp_test_oBh8qMRL8F61TR";
 
         const checkoutHTML = `
           <html>

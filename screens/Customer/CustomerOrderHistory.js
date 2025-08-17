@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
   Alert,
   StyleSheet,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import axios from '../../utils/axiosInstance';
-import { useAuth } from '../../context/AuthContext';
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import axios from "../../utils/axiosInstance";
+import { useAuth } from "../../context/AuthContext";
 
 export default function CustomerOrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -19,21 +19,23 @@ export default function CustomerOrderHistory() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrderHistory = async () => {
       try {
-        const res = await axios.get('/orders/history', {
+        const response = await axios.get("/orders/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const filteredOrders = res.data.filter(order => order.status !== 'PENDING');
+        const filteredOrders = response.data.filter(
+          (order) => order.status !== "PENDING"
+        );
         setOrders(filteredOrders);
-      } catch (err) {
-        console.error('Error fetching orders:', err);
+      } catch (error) {
+        console.error("Failed to fetch order history", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
+    fetchOrderHistory();
   }, [token]);
 
   if (loading) {
@@ -57,78 +59,144 @@ export default function CustomerOrderHistory() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>My Order History</Text>
 
-      {orders.map(order => (
+      {orders.map((order) => (
         <View key={order.orderId} style={styles.card}>
-          <Text style={styles.label}>Order ID: <Text style={styles.value}>{order.orderId}</Text></Text>
-          <Text style={styles.label}>Pickup: <Text style={styles.value}>{order.pickupDate} at {order.pickupTime}</Text></Text>
-          <Text style={styles.label}>Delivery: <Text style={styles.value}>{order.deliveryDate ? `${order.deliveryDate} at ${order.deliveryTime}` : 'Pending'}</Text></Text>
-          <Text style={styles.label}>Status: <Text style={[styles.value, styles.status]}>{order.status}</Text></Text>
-          <Text style={styles.label}>Contact: <Text style={styles.value}>{order.contactName} ({order.contactPhone})</Text></Text>
-          <Text style={styles.label}>Address: <Text style={styles.value}>{order.contactAddress}</Text></Text>
-          <Text style={styles.timestamp}>Created at: {new Date(order.createdAt).toLocaleString()}</Text>
+          {/* Order Info */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Order ID:</Text>
+            <Text style={styles.value}>{order.orderId}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Pickup:</Text>
+            <Text style={styles.value}>
+              {order.pickupDate} at {order.pickupTime}
+            </Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Delivery:</Text>
+            <Text style={styles.value}>
+              {order.deliveryDate
+                ? `${order.deliveryDate} at ${order.deliveryTime}`
+                : "Pending"}
+            </Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Status:</Text>
+            <Text style={[styles.value, styles.status]}>{order.status}</Text>
+          </View>
 
-          <View style={styles.buttonGroup}>
+          {/* Contact Info */}
+          <View style={styles.contactBox}>
+            <Text style={styles.contactText}>
+              <Text style={styles.bold}>Contact:</Text> {order.contactName} (
+              {order.contactPhone})
+            </Text>
+            <Text style={styles.contactText}>
+              <Text style={styles.bold}>Address:</Text> {order.contactAddress}
+            </Text>
+          </View>
+
+          <Text style={styles.timestamp}>
+            Created at: {new Date(order.createdAt).toLocaleString()}
+          </Text>
+
+          {/* Promotion Button */}
+          <View style={styles.centerBtn}>
             <TouchableOpacity
-              style={order.isPromotionApplied ? styles.disabledBtn : styles.greenBtn}
-              onPress={() =>
-                order.isPromotionApplied
-                  ? Alert.alert('Info', 'A promotion is already applied to this order.')
-                  : navigation.navigate('AvailablePromotions', { orderId: order.orderId })
-              }
+              onPress={() => {
+                if (order.isPromotionApplied) {
+                  Alert.alert(
+                    "Info",
+                    "A promotion is already applied to this order."
+                  );
+                } else {
+                  navigation.navigate("AvailablePromotions", {
+                    orderId: order.orderId,
+                  });
+                }
+              }}
               disabled={order.isPromotionApplied}
+              style={[
+                styles.baseBtn,
+                order.isPromotionApplied ? styles.disabledBtn : styles.greenBtn,
+              ]}
             >
               <Text style={styles.btnText}>
                 {order.isPromotionApplied
                   ? `Promotion Applied (${order.appliedPromoCode})`
-                  : 'Apply Promotion'}
+                  : "Apply Promotion"}
               </Text>
             </TouchableOpacity>
+          </View>
 
+          {/* Summary Button */}
+          <View style={styles.rightBtn}>
             <TouchableOpacity
-              style={styles.blueBtn}
-              onPress={() => navigation.navigate('OrderSummary', { orderId: order.orderId })}
+              style={[styles.baseBtn, styles.blueBtn]}
+              onPress={() =>
+                navigation.navigate("OrderSummary", { orderId: order.orderId })
+              }
             >
               <Text style={styles.btnText}>View Summary</Text>
             </TouchableOpacity>
+          </View>
 
+          {/* Bill Button */}
+          <View style={styles.rightBtn}>
             <TouchableOpacity
-              style={styles.purpleBtn}
-              onPress={() => navigation.navigate('OrderBill', { orderId: order.orderId })}
+              style={[styles.baseBtn, styles.purpleBtn]}
+              onPress={() =>
+                navigation.navigate("OrderBill", { orderId: order.orderId })
+              }
             >
               <Text style={styles.btnText}>View Bill</Text>
             </TouchableOpacity>
+          </View>
 
-            {order.status !== 'DELIVERED' && (
+          {/* Track Button (if not delivered) */}
+          {order.status !== "DELIVERED" && (
+            <View style={styles.rightBtn}>
               <TouchableOpacity
-                style={styles.orangeBtn}
-                onPress={() => navigation.navigate('TrackOrder', { orderId: order.orderId })}
+                style={[styles.baseBtn, styles.orangeBtn]}
+                onPress={() =>
+                  navigation.navigate("TrackOrder", { orderId: order.orderId })
+                }
               >
                 <Text style={styles.btnText}>Track Order</Text>
               </TouchableOpacity>
-            )}
+            </View>
+          )}
 
+          {/* Cancel Button */}
+          <TouchableOpacity
+            style={[styles.baseBtn, styles.redBtn, { marginTop: 12 }]}
+            onPress={() =>
+              navigation.navigate("CancelOrder", { orderId: order.orderId })
+            }
+          >
+            <Text style={styles.btnText}>Cancel Order</Text>
+          </TouchableOpacity>
+
+          {/* Reschedule Button */}
+          <TouchableOpacity
+            style={[styles.baseBtn, styles.yellowBtn, { marginTop: 12 }]}
+            onPress={() =>
+              navigation.navigate("RescheduleOrder", { orderId: order.orderId })
+            }
+          >
+            <Text style={styles.btnText}>Reschedule Order</Text>
+          </TouchableOpacity>
+
+          {/* Feedback Button */}
+          {order.status === "DELIVERED" && (
             <TouchableOpacity
-              style={styles.redBtn}
-              onPress={() => navigation.navigate('CancelOrder', { orderId: order.orderId })}
+              onPress={() =>
+                navigation.navigate("Feedback", { orderId: order.orderId })
+              }
             >
-              <Text style={styles.btnText}>Cancel Order</Text>
+              <Text style={styles.link}>Give Feedback</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.yellowBtn}
-              onPress={() => navigation.navigate('RescheduleOrder', { orderId: order.orderId })}
-            >
-              <Text style={styles.btnText}>Reschedule Order</Text>
-            </TouchableOpacity>
-
-            {order.status === 'DELIVERED' && (
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Feedback', { orderId: order.orderId })}
-              >
-                <Text style={styles.link}>Give Feedback</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          )}
         </View>
       ))}
     </ScrollView>
@@ -139,91 +207,59 @@ const styles = StyleSheet.create({
   container: { padding: 16 },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 16,
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#2563EB',
+    color: "#2563EB",
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
     elevation: 3,
   },
-  label: {
-    fontWeight: 'bold',
-    color: '#333',
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
   },
-  value: {
-    fontWeight: 'normal',
-  },
-  status: {
-    color: '#2563EB',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 8,
-  },
-  buttonGroup: {
-    marginTop: 16,
-    gap: 8,
-  },
-  greenBtn: {
-    backgroundColor: '#16A34A',
-    padding: 10,
+  label: { fontWeight: "500", color: "#555" },
+  value: { color: "#111" },
+  status: { fontWeight: "600", color: "#2563EB" },
+  contactBox: { marginTop: 8 },
+  contactText: { fontSize: 14, color: "#333", marginBottom: 2 },
+  bold: { fontWeight: "bold" },
+  timestamp: { fontSize: 12, color: "#888", marginTop: 6 },
+  baseBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     borderRadius: 8,
   },
-  disabledBtn: {
-    backgroundColor: '#A1A1AA',
-    padding: 10,
-    borderRadius: 8,
-  },
-  blueBtn: {
-    backgroundColor: '#2563EB',
-    padding: 10,
-    borderRadius: 8,
-  },
-  purpleBtn: {
-    backgroundColor: '#7C3AED',
-    padding: 10,
-    borderRadius: 8,
-  },
-  orangeBtn: {
-    backgroundColor: '#F97316',
-    padding: 10,
-    borderRadius: 8,
-  },
-  redBtn: {
-    backgroundColor: '#DC2626',
-    padding: 10,
-    borderRadius: 8,
-  },
-  yellowBtn: {
-    backgroundColor: '#FACC15',
-    padding: 10,
-    borderRadius: 8,
-  },
-  btnText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: '600',
-  },
+  centerBtn: { marginTop: 14, alignItems: "center" },
+  rightBtn: { marginTop: 12, alignItems: "flex-end" },
+  btnText: { color: "#fff", textAlign: "center", fontWeight: "600" },
+  greenBtn: { backgroundColor: "#16A34A" },
+  disabledBtn: { backgroundColor: "#A1A1AA" },
+  blueBtn: { backgroundColor: "#2563EB" },
+  purpleBtn: { backgroundColor: "#7C3AED" },
+  orangeBtn: { backgroundColor: "#F97316" },
+  redBtn: { backgroundColor: "#DC2626" },
+  yellowBtn: { backgroundColor: "#FACC15" },
   link: {
-    color: '#2563EB',
-    textAlign: 'center',
-    marginTop: 8,
-    textDecorationLine: 'underline',
+    color: "#2563EB",
+    textAlign: "center",
+    marginTop: 14,
+    textDecorationLine: "underline",
   },
 });
